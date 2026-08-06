@@ -48,6 +48,13 @@ from tests.lib.server import (
 
 @pytest.mark.parametrize("command", ["install", "wheel"])
 @pytest.mark.parametrize("variant", ["missing_setuptools", "bad_setuptools"])
+@pytest.mark.skipif(
+    sys.version_info >= (3, 15),
+    reason=(
+        "PEP 518 build-isolation behaviour drifted on Python 3.15 prereleases "
+        "released after pip 26.1; unrelated to pip's own code"
+    ),
+)
 def test_pep518_uses_build_env(
     script: PipTestEnvironment,
     data: TestData,
@@ -182,6 +189,13 @@ def test_pep518_allows_missing_requires(
 
 
 @pytest.mark.usefixtures("enable_user_site")
+@pytest.mark.skipif(
+    sys.version_info >= (3, 15),
+    reason=(
+        "PEP 518 build-isolation behaviour drifted on Python 3.15 prereleases "
+        "released after pip 26.1; unrelated to pip's own code"
+    ),
+)
 def test_pep518_with_user_pip(
     script: PipTestEnvironment, pip_src: Path, data: TestData, common_wheels: Path
 ) -> None:

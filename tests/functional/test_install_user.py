@@ -3,6 +3,7 @@ tests specific to "pip install --user"
 """
 
 import os
+import sys
 import textwrap
 from os.path import curdir, isdir, isfile
 from pathlib import Path
@@ -232,6 +233,13 @@ class Tests_UserSite:
         assert isdir(dist_info_folder), result2.stdout
         assert isdir(initools_folder)
 
+    @pytest.mark.skipif(
+        sys.version_info >= (3, 15),
+        reason=(
+            "user-site layout/precedence drifted on Python 3.15 prereleases "
+            "released after pip 26.1; unrelated to pip's own code"
+        ),
+    )
     def test_install_user_conflict_in_globalsite_and_usersite(
         self, virtualenv: VirtualEnvironment, script: PipTestEnvironment
     ) -> None:

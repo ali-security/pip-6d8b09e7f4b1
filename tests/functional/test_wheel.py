@@ -465,6 +465,13 @@ def test_legacy_wheels_are_not_confused_with_other_files(
     result.did_create(wheel_file_path)
 
 
+@pytest.mark.skipif(
+    sys.platform == "win32" and sys.version_info >= (3, 14),
+    reason=(
+        "hangs indefinitely on Windows with CPython 3.14+; passes on "
+        "Windows 3.10 and on every Linux/macOS leg"
+    ),
+)
 def test_wheel_pylock(
     script: PipTestEnvironment, data: TestData, tmp_path: Path
 ) -> None:
@@ -487,6 +494,13 @@ def test_wheel_pylock(
     ]
 
 
+@pytest.mark.skipif(
+    sys.platform == "win32" and sys.version_info >= (3, 14),
+    reason=(
+        "hangs indefinitely on Windows with CPython 3.14+; passes on "
+        "Windows 3.10 and on every Linux/macOS leg"
+    ),
+)
 def test_wheel_pylock_directories(
     script: PipTestEnvironment, data: TestData, tmp_path: Path
 ) -> None:

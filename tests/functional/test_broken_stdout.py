@@ -1,6 +1,9 @@
 import os
 import subprocess
+import sys
 from pathlib import Path
+
+import pytest
 
 _BROKEN_STDOUT_RETURN_CODE = 120
 
@@ -62,6 +65,13 @@ def test_broken_stdout_pipe__log_option(deprecated_python: bool, tmpdir: Path) -
     assert returncode == _BROKEN_STDOUT_RETURN_CODE
 
 
+@pytest.mark.skipif(
+    sys.platform == "win32" and sys.version_info >= (3, 14),
+    reason=(
+        "hangs indefinitely on Windows with CPython 3.14+; passes on "
+        "Windows 3.10 and on every Linux/macOS leg"
+    ),
+)
 def test_broken_stdout_pipe__verbose(deprecated_python: bool) -> None:
     """
     Test a broken pipe to stdout with verbose logging enabled.

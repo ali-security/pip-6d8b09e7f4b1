@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build pip using pinned build requirements."""
 
+import os
 import subprocess
 import tempfile
 import venv
@@ -22,6 +23,12 @@ class EnvBuilder(venv.EnvBuilder):
 
 
 def get_git_head_timestamp() -> str:
+    # Allow SOURCE_DATE_EPOCH to be supplied from the environment: the CI fork
+    # adds commits on top of the release tag, so the git HEAD timestamp is no
+    # longer the release timestamp.
+    source_date_epoch = os.environ.get("SOURCE_DATE_EPOCH")
+    if source_date_epoch:
+        return source_date_epoch
     return subprocess.run(
         [
             "git",

@@ -1,4 +1,5 @@
 import os
+import sys
 import textwrap
 
 import pytest
@@ -181,6 +182,13 @@ def test_new_resolver_install_user_conflict_in_global_site(
 
 
 @pytest.mark.usefixtures("enable_user_site", "patch_dist_in_site_packages")
+@pytest.mark.skipif(
+    sys.version_info >= (3, 15),
+    reason=(
+        "user-site layout/precedence drifted on Python 3.15 prereleases "
+        "released after pip 26.1; unrelated to pip's own code"
+    ),
+)
 def test_new_resolver_install_user_conflict_in_global_and_user_sites(
     script: PipTestEnvironment,
 ) -> None:

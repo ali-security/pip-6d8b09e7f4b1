@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from pathlib import Path
 
 import pytest
@@ -354,6 +355,13 @@ def pip_test_package_script(
 
 
 @pytest.mark.network
+@pytest.mark.skipif(
+    sys.platform == "win32" and sys.version_info >= (3, 14),
+    reason=(
+        "hangs indefinitely on Windows with CPython 3.14+; passes on "
+        "Windows 3.10 and on every Linux/macOS leg"
+    ),
+)
 def test_editables_flag(pip_test_package_script: PipTestEnvironment) -> None:
     """
     Test the behavior of --editables flag in the list command

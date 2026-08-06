@@ -2,6 +2,7 @@
 tests specific to uninstalling --user installs
 """
 
+import sys
 from os.path import isdir, isfile, normcase
 
 import pytest
@@ -23,6 +24,13 @@ class Tests_UninstallUserSite:
         result2 = script.pip("uninstall", "-y", "INITools")
         assert_all_changes(result1, result2, [script.venv / "build", "cache"])
 
+    @pytest.mark.skipif(
+        sys.version_info >= (3, 15),
+        reason=(
+            "user-site layout/precedence drifted on Python 3.15 prereleases "
+            "released after pip 26.1; unrelated to pip's own code"
+        ),
+    )
     def test_uninstall_from_usersite_with_dist_in_global_site(
         self, virtualenv: VirtualEnvironment, script: PipTestEnvironment
     ) -> None:

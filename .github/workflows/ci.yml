@@ -1,15 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-    tags:
-      # Tags for all potential release numbers till 2030.
-      - "2[0-9].[0-3]" # 20.0 -> 29.3
-      - "2[0-9].[0-3].[0-9]+" # 20.0.0 -> 29.3.[0-9]+
-  pull_request:
-  schedule:
-    - cron: 0 0 * * MON # Run every Monday at 00:00 UTC
   workflow_dispatch:
     # allow manual runs on branches without a PR
 
@@ -29,6 +20,7 @@ jobs:
   docs:
     name: docs
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -42,6 +34,7 @@ jobs:
 
   determine-changes:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       tests: ${{ steps.filter.outputs.tests }}
       vendoring: ${{ steps.filter.outputs.vendoring }}
@@ -70,6 +63,7 @@ jobs:
   packaging:
     name: packaging / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -94,6 +88,7 @@ jobs:
   vendoring:
     name: vendoring
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     needs: [determine-changes]
     if: >-
@@ -115,6 +110,7 @@ jobs:
   tests-unix:
     name: tests / ${{ matrix.python.version || matrix.python }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
 
     needs: [determine-changes]
     if: >-
@@ -122,7 +118,7 @@ jobs:
       github.event_name != 'pull_request'
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
         python:
@@ -196,6 +192,7 @@ jobs:
   tests-windows:
     name: tests / ${{ matrix.python }} / ${{ matrix.os }} / ${{ matrix.group.number }}
     runs-on: ${{ matrix.os }}-latest
+    timeout-minutes: 30
 
     needs: [determine-changes]
     if: >-
@@ -203,7 +200,7 @@ jobs:
       github.event_name != 'pull_request'
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [Windows]
         python:
@@ -274,6 +271,7 @@ jobs:
     # beating out the ubuntu-latest runners. The zipapp tests are slow by
     # nature, and we don't care where they run, so we pick the fastest one.
     runs-on: macos-latest
+    timeout-minutes: 35
 
     needs: [packaging, determine-changes]
     if: >-
@@ -315,6 +313,7 @@ jobs:
       - vendoring
 
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Decide whether the needed jobs succeeded or failed

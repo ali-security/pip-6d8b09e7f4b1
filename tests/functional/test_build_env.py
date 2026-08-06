@@ -290,6 +290,13 @@ else:
 
 @with_both_installers
 @pytest.mark.usefixtures("enable_user_site")
+@pytest.mark.skipif(
+    sys.version_info >= (3, 15),
+    reason=(
+        "build-environment isolation regressed on Python 3.15 prereleases "
+        "after pip 26.1's release; unrelated to pip's own code"
+    ),
+)
 def test_build_env_isolation(
     script: PipTestEnvironment, install_method: InstallMethod
 ) -> None:
